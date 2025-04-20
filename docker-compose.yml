@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: spring-kubernetes
+      MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - "3306:3306"
+    volumes:
+      - spring-kubernetes-mysql:/var/lib/mysql
+      - ./db-scripts:/usr/db-scripts
+    networks:
+      - spring-kubernetes-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      MYSQL_ROOT_PASSWORD: mysql
+    ports:
+      - "8081:80"
+    depends_on:
+      - mysql
+    networks:
+      - spring-kubernetes-network
+
+volumes:
+  spring-kubernetes-mysql:
+
+networks:
+  spring-kubernetes-network:
+    driver: bridge
